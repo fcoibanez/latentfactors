@@ -1,5 +1,6 @@
 """Main Risk Premium PCA Class"""
 import numpy as np
+from sklearn.decomposition import TruncatedSVD
 
 
 class RiskPremiumPCA:
@@ -20,16 +21,27 @@ class RiskPremiumPCA:
 
         if std_norm:
             # Variance normalization matrix
-            V = X.T @ (I - _1_t / T) @ X
-            S = np.diag(np.sqrt(np.diag(V / T)))  # Diag std dev
-            WN = np.inv(S)
+            V = (1 / T) * X.T @ (I - _1_t / T) @ X
+            D = np.diag(np.sqrt(np.diag(V)))  # Diag std dev
+            WN = np.linalg.inv(D)
         else:
             WN = np.eye(N)
 
-        WT = I + self._gamma / T * _1_t
+        WT = I + (1 / T) * self._gamma * _1_t
 
         # Generic estimator for general weighting matrices
-        X_hat = X @ WN
+        X_tilde = X @ WN
+
+        # Covariance matrix with weighted mean & truncated decomposition
+        V_tilde = (1 / T) * X_tilde.T @ WT @ X_tilde
+
+        trnsf = TruncatedSVD(n_components=self._k)
+        trnsf.fit(V_tilde)
+        Vh = trnsf.components_
+        S = np.diag(trnsf.singular_values_)
+
+        # Lambda hat are the eigenvectors after reverting the cross-sectional transformation
+        lmb_hat = np.linalg.inv(WN) @ Vh.T
 
 
 if __name__ == "__main__":
