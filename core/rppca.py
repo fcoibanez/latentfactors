@@ -40,8 +40,23 @@ class RiskPremiumPCA:
         Vh = trnsf.components_
         S = np.diag(trnsf.singular_values_)
 
-        # Lambda hat are the eigenvectors after reverting the cross-sectional transformation
-        lmb_hat = np.linalg.inv(WN) @ Vh.T
+        # V_hat are the eigenvectors after reverting the cross-sectional transformation
+        V_hat = np.linalg.inv(WN) @ Vh.T
+
+        # Flips the signs of the eigenvectors
+        _sign = np.diag(np.sign(np.mean(X @ V_hat @ np.linalg.inv(V_hat.T @ V_hat), axis=0)))
+        V_hat = V_hat @ _sign
+
+        # Constructing the latent factors
+        factorweight = V_hat @ np.linalg.inv(V_hat.T @ V_hat)
+        factorweight = factorweight @ np.linalg.inv(np.diag(np.sqrt(np.diag(factorweight.T @ factorweight))))
+        F_hat = X @ factorweight
+
+        # If variance normalization is True, then the loading are scaled by the eigenvalues. Otherwise they have unit length.
+        if var_norm and not orthogonalize:
+            V_hat
+            # Here the loadings are normalized to have unit length
+
 
 
 if __name__ == "__main__":
