@@ -3,8 +3,8 @@ from datetime import datetime
 import os
 import numpy as np
 
-fldr = os.getcwd()
-data_fldr = f"{fldr}/data"
+fldr = r"D:\My Drive\bin\latentfactors"
+data_fldr = fr"{fldr}\data"
 
 trn_start_dt = datetime(1963, 7, 31)  # Training start
 bt_start_dt = datetime(2002, 12, 31)  # Backtest start
