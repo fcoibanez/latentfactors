@@ -70,11 +70,10 @@ def LoglikNomean(vP, Data, mF):
     Output:   Value - loglikelihood value
     """
 
-    iT = len(Data)  # Number of time periods
     iR = mF.shape[1]  # Number of factors
 
     vPtrans = (
-        vP.copy()
+        vP.copy().reshape(-1, 1)
     )  # Vector of parameters (create a copy to avoid modifying the original)
     for i in range(iR):
         vPtrans[2 * i + 1] = np.exp(vP[2 * i + 1])
